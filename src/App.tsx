@@ -23,6 +23,7 @@ const App: React.FC = () => {
 	const [lastPredictedSvgs, setLastPredictedSvgs] = useState<string[]>([]);
 	const [lastTensors, setLastTensors] = useState<tf.Tensor[]>([]);
 	const [lastImages, setLastImages] = useState<HTMLCanvasElement[]>([]);
+	const [stats, setStats] = useState({ uniqueChars: 0, totalSamples: 0 });
 	const canvasRef = useRef<ReactSketchCanvasRef>(null);
 
 	useEffect(() => {
@@ -36,6 +37,19 @@ const App: React.FC = () => {
 			setCanTrain(eligible >= 2);
 		};
 		checkCanTrain();
+	}, [samplesVersion]);
+
+	useEffect(() => {
+		const fetchStats = async () => {
+			const all = await getAllSamples();
+			const uniqueChars = Object.keys(all).length;
+			const totalSamples = Object.values(all).reduce(
+				(sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+				0
+			);
+			setStats({ uniqueChars, totalSamples });
+		};
+		fetchStats();
 	}, [samplesVersion]);
 
 	useEffect(() => {
@@ -113,7 +127,16 @@ const App: React.FC = () => {
 	return (
 		<>
 			{canTrain && (
-				<div style={{ position: 'fixed', top: 24, right: 32, zIndex: 1000 }}>
+				<div
+					style={{
+						position: 'fixed',
+						top: 24,
+						right: 32,
+						zIndex: 1000,
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'flex-end',
+					}}>
 					<button
 						onClick={handleTrain}
 						style={{
@@ -129,6 +152,25 @@ const App: React.FC = () => {
 						}}>
 						Train Model
 					</button>
+					<div
+						style={{
+							marginTop: 12,
+							background: '#fff',
+							borderRadius: 8,
+							boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+							padding: '10px 18px',
+							fontSize: 15,
+							color: '#2d3748',
+							minWidth: 180,
+							textAlign: 'right',
+						}}>
+						<div>
+							<b>Unique Characters:</b> {stats.uniqueChars}
+						</div>
+						<div>
+							<b>Total Samples:</b> {stats.totalSamples}
+						</div>
+					</div>
 				</div>
 			)}
 			<div className='app-container'>
