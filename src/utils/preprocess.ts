@@ -33,17 +33,6 @@ export const imageToTensor = async (
 	} else {
 		ctx.drawImage(image, 0, 0);
 	}
-	// DEBUG: Show the canvas being read for tensor
-	const prev = document.getElementById('tensor-debug-canvas');
-	if (prev) prev.remove();
-	canvas.id = 'tensor-debug-canvas';
-	canvas.style.border = '2px solid red';
-	canvas.style.position = 'fixed';
-	canvas.style.top = '10px';
-	canvas.style.right = '10px';
-	canvas.style.zIndex = '9999';
-	document.body.appendChild(canvas);
-	// END DEBUG
 	const imageData = ctx.getImageData(0, 0, 64, 64);
 	const { data } = imageData;
 	const gray: number[] = [];
