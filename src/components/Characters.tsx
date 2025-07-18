@@ -3,6 +3,7 @@ import { getAllSamples, deleteSample } from '../utils/storage';
 import TensorPreview from './TensorPreview';
 import { svgToTensor } from '../utils/preprocess';
 import * as tf from '@tensorflow/tfjs';
+import { set } from 'idb-keyval';
 
 interface CharactersProps {
 	onSampleClick: (svg: string) => void;
@@ -18,7 +19,7 @@ const Characters: React.FC<CharactersProps> = ({
 	onSampleDelete,
 }) => {
 	const [samples, setSamples] = useState<Record<string, string[]>>({});
-	const [selected, setSelected] = useState<number | null>(null);
+	const [selected, setSelected] = useState<number[]>([]);
 	const [tensors, setTensors] = useState<Record<string, tf.Tensor[]>>({});
 	const [showSamples, setShowSamples] = useState(true);
 
@@ -26,7 +27,7 @@ const Characters: React.FC<CharactersProps> = ({
 		const fetchSamples = async () => {
 			const all = await getAllSamples();
 			setSamples(all);
-			setSelected(null);
+			setSelected([]);
 			// Generate tensors for all samples
 			const newTensors: Record<string, tf.Tensor[]> = {};
 			for (const [char, svgs] of Object.entries(all)) {
@@ -50,14 +51,29 @@ const Characters: React.FC<CharactersProps> = ({
 	const charTensors = tensors[currentChar] || [];
 
 	const handleSelect = (idx: number) => {
-		setSelected(selected === idx ? null : idx);
+		setSelected((prev) =>
+			prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
+		);
 	};
 
-	const handleDelete = async () => {
-		if (selected === null) return;
-		const svg = charSamples[selected];
-		await deleteSample(currentChar, svg);
-		setSelected(null);
+	const handleSelectAll = (checked: boolean) => {
+		if (checked) {
+			setSelected(charSamples.map((_, idx) => idx));
+		} else {
+			setSelected([]);
+		}
+	};
+
+	const handleDeleteSelected = async () => {
+		if (selected.length === 0) return;
+		if (
+			!window.confirm('Are you sure you want to delete the selected samples?')
+		)
+			return;
+		for (const idx of selected) {
+			await deleteSample(currentChar, charSamples[idx]);
+		}
+		setSelected([]);
 		if (onSampleDelete) onSampleDelete();
 	};
 
@@ -84,6 +100,17 @@ const Characters: React.FC<CharactersProps> = ({
 					/>
 					Show Samples
 				</label>
+				{showSamples && charSamples.length > 0 && (
+					<label style={{ fontSize: 16, marginLeft: 24 }}>
+						<input
+							type='checkbox'
+							checked={selected.length === charSamples.length}
+							onChange={(e) => handleSelectAll(e.target.checked)}
+							style={{ marginRight: 6 }}
+						/>
+						Select All
+					</label>
+				)}
 			</div>
 			{showSamples && (
 				<>
@@ -104,12 +131,11 @@ const Characters: React.FC<CharactersProps> = ({
 									display: 'flex',
 									flexDirection: 'column',
 									alignItems: 'center',
-									background: selected === idx ? '#e6f7ff' : '#fff',
+									background: selected.includes(idx) ? '#e6f7ff' : '#fff',
 									borderRadius: 6,
-									boxShadow:
-										selected === idx
-											? '0 0 0 2px #3182ce'
-											: '0 1px 2px rgba(0,0,0,0.04)',
+									boxShadow: selected.includes(idx)
+										? '0 0 0 2px #3182ce'
+										: '0 1px 2px rgba(0,0,0,0.04)',
 									transition: 'box-shadow 0.2s, background 0.2s',
 									padding: 6,
 									cursor: 'pointer',
@@ -118,8 +144,9 @@ const Characters: React.FC<CharactersProps> = ({
 								title={`Sample ${idx + 1}`}>
 								<div
 									style={{
-										border:
-											selected === idx ? '2px solid #3182ce' : '1px solid #ccc',
+										border: selected.includes(idx)
+											? '2px solid #3182ce'
+											: '1px solid #ccc',
 										width: 32,
 										height: 32,
 										borderRadius: 4,
@@ -149,7 +176,7 @@ const Characters: React.FC<CharactersProps> = ({
 							</div>
 						))}
 					</div>
-					{selected !== null && (
+					{selected.length > 0 && (
 						<button
 							style={{
 								marginTop: 12,
@@ -162,7 +189,7 @@ const Characters: React.FC<CharactersProps> = ({
 								fontWeight: 500,
 								fontSize: 16,
 							}}
-							onClick={handleDelete}>
+							onClick={handleDeleteSelected}>
 							Delete Selected
 						</button>
 					)}

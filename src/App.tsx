@@ -8,13 +8,18 @@ import { predict } from './utils/predict';
 import { segmentStrokes, pathsToSvg } from './utils/preprocess';
 import { ReactSketchCanvasRef } from 'react-sketch-canvas';
 import { getAllSamples } from './utils/storage';
-import TensorPreview, { ImagePreview } from './components/TensorPreview';
+import {
+	getAllChars,
+	getCharsToTrain,
+	getCharVariants,
+} from './utils/fontChars';
 import * as tf from '@tensorflow/tfjs';
 import { svgToTensor, svgToImage } from './utils/preprocess';
 import Prediction from './components/Prediction';
 
 const App: React.FC = () => {
 	const [char, setChar] = useState('ሀ');
+	const [variant, setVariant] = useState('');
 	const [prediction, setPrediction] = useState<string[]>([]);
 	const [importedSvg, setImportedSvg] = useState<string | null>(null);
 	const [samplesVersion, setSamplesVersion] = useState(0);
@@ -86,7 +91,7 @@ const App: React.FC = () => {
 		const paths = await canvasRef.current.exportPaths();
 		const charGroups = segmentStrokes(paths);
 		const svgs = charGroups.map((group) => pathsToSvg(group));
-		await saveSample(char, svgs);
+		await saveSample(variant, svgs);
 		setSamplesVersion((v) => v + 1);
 	};
 
@@ -96,7 +101,7 @@ const App: React.FC = () => {
 	};
 
 	const handlePredict = async (svg: string) => {
-		const result = await predict(svg, ['ሀ', 'ለ', 'ሐ']);
+		const result = await predict(svg, getAllChars());
 		return result;
 	};
 
@@ -184,7 +189,10 @@ const App: React.FC = () => {
 						}}>
 						<select
 							value={char}
-							onChange={(e) => setChar(e.target.value)}
+							onChange={(e) => {
+								setChar(e.target.value);
+								setVariant(e.target.value);
+							}}
 							style={{
 								padding: '8px 16px',
 								borderRadius: 6,
@@ -192,11 +200,47 @@ const App: React.FC = () => {
 								fontSize: 18,
 								minWidth: 120,
 							}}>
-							<option>ሀ</option>
-							<option>ለ</option>
-							<option>ሐ</option>
+							{getCharsToTrain().map((char) => (
+								<option
+									key={char}
+									value={char}>
+									{char}
+								</option>
+							))}
 						</select>
 					</div>
+					<>
+						<div
+							style={{
+								display: 'flex',
+								gap: 12,
+								justifyContent: 'center',
+								margin: '12px 0',
+							}}>
+							{getCharVariants(char).map((v) => (
+								<div
+									key={v}
+									onClick={() => setVariant(v)}
+									style={{
+										padding: '6px 18px',
+										borderRadius: 6,
+										background: variant === v ? '#3182ce' : '#e2e8f0',
+										color: variant === v ? '#fff' : '#2d3748',
+										fontWeight: 500,
+										fontSize: 18,
+										cursor: 'pointer',
+										border: 'none',
+										boxShadow:
+											variant === v
+												? '0 2px 8px rgba(49,130,206,0.15)'
+												: 'none',
+										transition: 'background 0.2s, color 0.2s',
+									}}>
+									{v}
+								</div>
+							))}
+						</div>
+					</>
 					<div style={{ width: '100%', margin: '0 auto', marginBottom: 16 }}>
 						<DrawingCanvas
 							onSave={handleSave}
@@ -225,7 +269,7 @@ const App: React.FC = () => {
 					}}>
 					<Characters
 						onSampleClick={handleSampleClick}
-						currentChar={char}
+						currentChar={variant}
 						refreshKey={samplesVersion}
 						onSampleDelete={() => setSamplesVersion((v) => v + 1)}
 					/>
