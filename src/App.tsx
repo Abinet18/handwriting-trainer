@@ -11,6 +11,7 @@ import { getAllSamples } from './utils/storage';
 import TensorPreview, { ImagePreview } from './components/TensorPreview';
 import * as tf from '@tensorflow/tfjs';
 import { svgToTensor, svgToImage } from './utils/preprocess';
+import Prediction from './components/Prediction';
 
 const App: React.FC = () => {
 	const [char, setChar] = useState('ሀ');
@@ -110,98 +111,101 @@ const App: React.FC = () => {
 	};
 
 	return (
-		<div>
-			<h1>Handwriting Trainer</h1>
-			<select
-				value={char}
-				onChange={(e) => setChar(e.target.value)}>
-				<option>ሀ</option>
-				<option>ለ</option>
-				<option>ሐ</option>
-			</select>
-			<DrawingCanvas
-				onSave={handleSave}
-				svgToLoad={importedSvg}
-				ref={canvasRef}
-			/>
-
-			<Characters
-				onSampleClick={handleSampleClick}
-				currentChar={char}
-				refreshKey={samplesVersion}
-				onSampleDelete={() => setSamplesVersion((v) => v + 1)}
-			/>
-			<button
-				onClick={handleRecognize}
-				disabled={isRecognizing}
-				style={{ marginTop: 8, marginBottom: 8 }}>
-				{isRecognizing ? 'Recognizing...' : 'Recognize'}
-			</button>
-			{lastPredictedSvgs.length > 0 && (
-				<div style={{ margin: '12px 0' }}>
-					<div>Predicted SVGs:</div>
-					<div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-						{lastPredictedSvgs.map((svg, index) => (
-							<div
-								key={index}
-								style={{ textAlign: 'center' }}>
-								<div
-									dangerouslySetInnerHTML={{ __html: svg }}
-									style={{
-										width: 64,
-										height: 64,
-										border: '1px solid #ccc',
-										display: 'inline-block',
-										background: '#fff',
-									}}
-								/>
-							</div>
-						))}
-					</div>
-					{lastImages.length > 0 && (
-						<div>
-							<div>Image Previews:</div>
-							<div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-								{lastImages.map((image, index) => (
-									<div
-										key={index}
-										style={{ textAlign: 'center' }}>
-										<div style={{ fontSize: '12px', marginBottom: '4px' }}>
-											Char {index + 1}
-										</div>
-										<ImagePreview image={image} />
-									</div>
-								))}
-							</div>
-						</div>
-					)}
-					{lastTensors.length > 0 && (
-						<div>
-							<div>Tensor Previews:</div>
-							<div style={{ display: 'flex', gap: '8px' }}>
-								{lastTensors.map((tensor, index) => (
-									<div
-										key={index}
-										style={{ textAlign: 'center' }}>
-										<div style={{ fontSize: '12px', marginBottom: '4px' }}>
-											Char {index + 1}
-										</div>
-										<TensorPreview tensor={tensor} />
-									</div>
-								))}
-							</div>
-						</div>
-					)}
+		<>
+			{canTrain && (
+				<div style={{ position: 'fixed', top: 24, right: 32, zIndex: 1000 }}>
+					<button
+						onClick={handleTrain}
+						style={{
+							padding: '10px 28px',
+							borderRadius: 8,
+							background: '#805ad5',
+							color: '#fff',
+							border: 'none',
+							fontWeight: 600,
+							fontSize: 18,
+							boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+							cursor: 'pointer',
+						}}>
+						Train Model
+					</button>
 				</div>
 			)}
-
-			<p>
-				Prediction:{' '}
-				{prediction.length > 0 ? prediction.join(', ') : 'No prediction yet.'}
-			</p>
-			<DataExportImport />
-			{canTrain && <button onClick={handleTrain}>Train Model</button>}
-		</div>
+			<div className='app-container'>
+				<h1 style={{ textAlign: 'center' }}>Handwriting Trainer</h1>
+				<div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							marginBottom: 16,
+						}}>
+						<select
+							value={char}
+							onChange={(e) => setChar(e.target.value)}
+							style={{
+								padding: '8px 16px',
+								borderRadius: 6,
+								border: '1px solid #cbd5e1',
+								fontSize: 18,
+								minWidth: 120,
+							}}>
+							<option>ሀ</option>
+							<option>ለ</option>
+							<option>ሐ</option>
+						</select>
+					</div>
+					<div style={{ width: '100%', margin: '0 auto', marginBottom: 16 }}>
+						<DrawingCanvas
+							onSave={handleSave}
+							onRecognize={handleRecognize}
+							svgToLoad={importedSvg}
+							ref={canvasRef}
+						/>
+					</div>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							gap: 16,
+							marginBottom: 24,
+						}}>
+						{/* Removed Save Sample and Recognize buttons from here */}
+					</div>
+				</div>
+				<div
+					style={{
+						background: '#f9fafb',
+						borderRadius: 12,
+						padding: 20,
+						boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+						marginBottom: 24,
+					}}>
+					<Characters
+						onSampleClick={handleSampleClick}
+						currentChar={char}
+						refreshKey={samplesVersion}
+						onSampleDelete={() => setSamplesVersion((v) => v + 1)}
+					/>
+				</div>
+				<Prediction
+					lastPredictedSvgs={lastPredictedSvgs}
+					lastImages={lastImages}
+					lastTensors={lastTensors}
+					prediction={prediction}
+				/>
+				<div
+					style={{
+						marginTop: 32,
+						background: '#f9fafb',
+						borderRadius: 12,
+						padding: 20,
+						boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+					}}>
+					<DataExportImport />
+				</div>
+			</div>
+		</>
 	);
 };
 

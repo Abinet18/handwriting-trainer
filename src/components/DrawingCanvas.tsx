@@ -9,11 +9,12 @@ import { ReactSketchCanvas, ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 type Props = {
 	onSave: () => void;
+	onRecognize?: () => void;
 	svgToLoad?: string | null;
 };
 
 const DrawingCanvas = forwardRef<ReactSketchCanvasRef, Props>(
-	({ onSave, svgToLoad }, ref) => {
+	({ onSave, onRecognize, svgToLoad }, ref) => {
 		const canvasRef = useRef<ReactSketchCanvasRef>(null);
 		const [paths, setPaths] = useState<any[]>([]);
 		const [overlaySvg, setOverlaySvg] = useState<string | null>(null);
@@ -40,8 +41,8 @@ const DrawingCanvas = forwardRef<ReactSketchCanvasRef, Props>(
 		};
 
 		return (
-			<div style={{ position: 'relative', width: 300, height: 300 }}>
-				{overlaySvg && (
+			<div style={{ position: 'relative', width: '100%', margin: '0 auto' }}>
+				{/* {overlaySvg && (
 					<div
 						style={{
 							position: 'absolute',
@@ -55,17 +56,76 @@ const DrawingCanvas = forwardRef<ReactSketchCanvasRef, Props>(
 						}}
 						dangerouslySetInnerHTML={{ __html: overlaySvg }}
 					/>
-				)}
+				)} */}
 				<ReactSketchCanvas
 					ref={canvasRef}
 					strokeWidth={4}
 					strokeColor='black'
-					width='300px'
+					width='100%'
 					height='300px'
 					onStroke={handleStroke}
+					style={{
+						borderRadius: 12,
+						boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+						background: '#fff',
+						border: '2px solid #3182ce',
+						width: '100%',
+						height: '300px',
+						display: 'block',
+					}}
 				/>
-				<button onClick={handleSave}>Save Sample</button>
-				<button onClick={handleClear}>Clear Canvas</button>
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						gap: 16,
+						marginTop: 16,
+					}}>
+					<button
+						onClick={handleSave}
+						style={{
+							padding: '8px 24px',
+							borderRadius: 6,
+							background: '#3182ce',
+							color: '#fff',
+							border: 'none',
+							fontWeight: 500,
+							cursor: 'pointer',
+							fontSize: 18,
+						}}>
+						Save Sample
+					</button>
+					{onRecognize && (
+						<button
+							onClick={onRecognize}
+							style={{
+								padding: '8px 24px',
+								borderRadius: 6,
+								background: '#38a169',
+								color: '#fff',
+								border: 'none',
+								fontWeight: 600,
+								fontSize: 18,
+								cursor: 'pointer',
+							}}>
+							Recognize
+						</button>
+					)}
+					<button
+						onClick={handleClear}
+						style={{
+							padding: '8px 24px',
+							borderRadius: 6,
+							background: '#e53e3e',
+							color: '#fff',
+							border: 'none',
+							fontWeight: 500,
+							cursor: 'pointer',
+							fontSize: 18,
+						}}>
+						Clear Canvas
+					</button>
+				</div>
 			</div>
 		);
 	}

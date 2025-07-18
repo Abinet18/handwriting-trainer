@@ -20,6 +20,7 @@ const Characters: React.FC<CharactersProps> = ({
 	const [samples, setSamples] = useState<Record<string, string[]>>({});
 	const [selected, setSelected] = useState<number | null>(null);
 	const [tensors, setTensors] = useState<Record<string, tf.Tensor[]>>({});
+	const [showSamples, setShowSamples] = useState(true);
 
 	useEffect(() => {
 		const fetchSamples = async () => {
@@ -61,58 +62,111 @@ const Characters: React.FC<CharactersProps> = ({
 	};
 
 	return (
-		<div>
-			<h2>
+		<div
+			style={{
+				background: '#f9fafb',
+				borderRadius: 12,
+				padding: 20,
+				boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+				marginBottom: 24,
+			}}>
+			<h2 style={{ textAlign: 'center', fontWeight: 600, marginBottom: 16 }}>
 				Samples for {currentChar} ({charSamples.length})
 			</h2>
-			{charSamples.length === 0 && <p>No samples saved.</p>}
-			<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-				{charSamples.map((svg, idx) => (
+			<div
+				style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+				<label style={{ fontSize: 16 }}>
+					<input
+						type='checkbox'
+						checked={showSamples}
+						onChange={(e) => setShowSamples(e.target.checked)}
+						style={{ marginRight: 6 }}
+					/>
+					Show Samples
+				</label>
+			</div>
+			{showSamples && (
+				<>
+					{charSamples.length === 0 && (
+						<p style={{ textAlign: 'center' }}>No samples saved.</p>
+					)}
 					<div
-						key={idx}
 						style={{
 							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
+							gap: '12px',
+							flexWrap: 'wrap',
+							justifyContent: 'center',
 						}}>
-						<div
-							style={{
-								border: selected === idx ? '2px solid red' : '1px solid #ccc',
-								cursor: 'pointer',
-								width: 64,
-								height: 64,
-								overflow: 'hidden',
-								background: '#fff',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-							}}
-							onClick={() => handleSelect(idx)}
-							title={`Sample ${idx + 1}`}
-							dangerouslySetInnerHTML={{ __html: svg }}
-						/>
-						{charTensors[idx] && (
-							<div style={{ marginTop: 4 }}>
-								<TensorPreview tensor={charTensors[idx]} />
+						{charSamples.map((svg, idx) => (
+							<div
+								key={idx}
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'center',
+									background: selected === idx ? '#e6f7ff' : '#fff',
+									borderRadius: 6,
+									boxShadow:
+										selected === idx
+											? '0 0 0 2px #3182ce'
+											: '0 1px 2px rgba(0,0,0,0.04)',
+									transition: 'box-shadow 0.2s, background 0.2s',
+									padding: 6,
+									cursor: 'pointer',
+								}}
+								onClick={() => handleSelect(idx)}
+								title={`Sample ${idx + 1}`}>
+								<div
+									style={{
+										border:
+											selected === idx ? '2px solid #3182ce' : '1px solid #ccc',
+										width: 32,
+										height: 32,
+										borderRadius: 4,
+										overflow: 'hidden',
+										background: '#fff',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										marginBottom: 2,
+									}}
+									dangerouslySetInnerHTML={{
+										__html: svg
+											.replace(/width="\d+"/, 'width="32"')
+											.replace(/height="\d+"/, 'height="32"')
+											.replace(/viewBox="[^"]+"/, 'viewBox="0 0 64 64"'),
+									}}
+								/>
+								{charTensors[idx] && (
+									<div style={{ marginTop: 2 }}>
+										<TensorPreview
+											tensor={charTensors[idx]}
+											width={32}
+											height={32}
+										/>
+									</div>
+								)}
 							</div>
-						)}
+						))}
 					</div>
-				))}
-			</div>
-			{selected !== null && (
-				<button
-					style={{
-						marginTop: 8,
-						color: 'white',
-						background: 'red',
-						border: 'none',
-						borderRadius: 4,
-						padding: '4px 12px',
-						cursor: 'pointer',
-					}}
-					onClick={handleDelete}>
-					Delete Selected
-				</button>
+					{selected !== null && (
+						<button
+							style={{
+								marginTop: 12,
+								color: 'white',
+								background: '#e53e3e',
+								border: 'none',
+								borderRadius: 4,
+								padding: '6px 16px',
+								cursor: 'pointer',
+								fontWeight: 500,
+								fontSize: 16,
+							}}
+							onClick={handleDelete}>
+							Delete Selected
+						</button>
+					)}
+				</>
 			)}
 		</div>
 	);

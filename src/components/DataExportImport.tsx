@@ -26,14 +26,74 @@ const DataExportImport: React.FC = () => {
 	};
 
 	return (
-		<div>
-			<button onClick={handleExport}>Export Data</button>
-			<input
-				type='file'
-				accept='application/json'
-				onChange={handleImport}
-			/>
-			<button onClick={handleClear}>Clear All Data</button>
+		<div
+			style={{
+				background: '#f9fafb',
+				borderRadius: 12,
+				padding: 20,
+				boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+				margin: '0 auto',
+				maxWidth: 400,
+				textAlign: 'center',
+			}}>
+			<h3 style={{ marginBottom: 18, fontWeight: 600, textAlign: 'center' }}>
+				Data Export / Import
+			</h3>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 14,
+					alignItems: 'center',
+				}}>
+				<button
+					onClick={handleExport}
+					style={{
+						padding: '8px 20px',
+						borderRadius: 6,
+						background: '#3182ce',
+						color: '#fff',
+						border: 'none',
+						fontWeight: 500,
+						fontSize: 16,
+						cursor: 'pointer',
+					}}>
+					Export Data
+				</button>
+				<label
+					style={{
+						display: 'inline-block',
+						padding: '8px 20px',
+						borderRadius: 6,
+						background: '#805ad5',
+						color: '#fff',
+						fontWeight: 500,
+						fontSize: 16,
+						cursor: 'pointer',
+					}}>
+					Import Data
+					<input
+						type='file'
+						accept='application/json'
+						onChange={handleImport}
+						style={{ display: 'none' }}
+					/>
+				</label>
+				<button
+					onClick={handleClear}
+					style={{
+						padding: '8px 20px',
+						borderRadius: 6,
+						background: '#e53e3e',
+						color: '#fff',
+						border: 'none',
+						fontWeight: 500,
+						fontSize: 16,
+						cursor: 'pointer',
+					}}>
+					Clear All Data
+				</button>
+			</div>
 		</div>
 	);
 };
