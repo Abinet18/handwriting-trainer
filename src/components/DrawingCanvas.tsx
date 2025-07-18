@@ -27,6 +27,9 @@ const DrawingCanvas = forwardRef<ReactSketchCanvasRef, Props>(
 
 		const handleSave = () => {
 			onSave();
+			canvasRef.current?.clearCanvas();
+			setPaths([]);
+			setOverlaySvg(null);
 		};
 
 		const handleClear = () => {
