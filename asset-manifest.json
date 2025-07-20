@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/handwriting-trainer/static/css/main.e6c13ad2.css",
-    "main.js": "/handwriting-trainer/static/js/main.bd62b3ab.js",
-    "static/js/453.7641c7b3.chunk.js": "/handwriting-trainer/static/js/453.7641c7b3.chunk.js",
-    "index.html": "/handwriting-trainer/index.html",
-    "main.e6c13ad2.css.map": "/handwriting-trainer/static/css/main.e6c13ad2.css.map",
-    "main.bd62b3ab.js.map": "/handwriting-trainer/static/js/main.bd62b3ab.js.map",
-    "453.7641c7b3.chunk.js.map": "/handwriting-trainer/static/js/453.7641c7b3.chunk.js.map"
+    "main.css": "/static/css/main.e6c13ad2.css",
+    "main.js": "/static/js/main.bd982048.js",
+    "static/js/453.7641c7b3.chunk.js": "/static/js/453.7641c7b3.chunk.js",
+    "index.html": "/index.html",
+    "main.e6c13ad2.css.map": "/static/css/main.e6c13ad2.css.map",
+    "main.bd982048.js.map": "/static/js/main.bd982048.js.map",
+    "453.7641c7b3.chunk.js.map": "/static/js/453.7641c7b3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.bd62b3ab.js"
+    "static/js/main.bd982048.js"
   ]
 }
