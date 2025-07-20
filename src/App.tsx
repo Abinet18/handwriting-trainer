@@ -131,53 +131,53 @@ const App: React.FC = () => {
 
 	return (
 		<>
-			{canTrain && (
+			<div
+				style={{
+					position: 'fixed',
+					top: 24,
+					right: 32,
+					zIndex: 1000,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'flex-end',
+				}}>
+				<button
+					onClick={handleTrain}
+					disabled={!canTrain}
+					style={{
+						padding: '10px 28px',
+						borderRadius: 8,
+						background: canTrain ? '#805ad5' : '#a0aec0',
+						color: '#fff',
+						border: 'none',
+						fontWeight: 600,
+						fontSize: 18,
+						boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+						cursor: canTrain ? 'pointer' : 'not-allowed',
+						opacity: canTrain ? 1 : 0.6,
+					}}>
+					Train Model
+				</button>
 				<div
 					style={{
-						position: 'fixed',
-						top: 24,
-						right: 32,
-						zIndex: 1000,
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'flex-end',
+						marginTop: 12,
+						background: '#fff',
+						borderRadius: 8,
+						boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+						padding: '10px 18px',
+						fontSize: 15,
+						color: '#2d3748',
+						minWidth: 180,
+						textAlign: 'right',
 					}}>
-					<button
-						onClick={handleTrain}
-						style={{
-							padding: '10px 28px',
-							borderRadius: 8,
-							background: '#805ad5',
-							color: '#fff',
-							border: 'none',
-							fontWeight: 600,
-							fontSize: 18,
-							boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-							cursor: 'pointer',
-						}}>
-						Train Model
-					</button>
-					<div
-						style={{
-							marginTop: 12,
-							background: '#fff',
-							borderRadius: 8,
-							boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-							padding: '10px 18px',
-							fontSize: 15,
-							color: '#2d3748',
-							minWidth: 180,
-							textAlign: 'right',
-						}}>
-						<div>
-							<b>Unique Characters:</b> {stats.uniqueChars}
-						</div>
-						<div>
-							<b>Total Samples:</b> {stats.totalSamples}
-						</div>
+					<div>
+						<b>Unique Characters:</b> {stats.uniqueChars}
+					</div>
+					<div>
+						<b>Total Samples:</b> {stats.totalSamples}
 					</div>
 				</div>
-			)}
+			</div>
 			<div className='app-container'>
 				<h1 style={{ textAlign: 'center' }}>Handwriting Trainer</h1>
 				<div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
